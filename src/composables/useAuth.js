@@ -38,6 +38,8 @@ const currentGroupId = computed(() => {
 
 const LOGIN_URL = '/cloud-user-registry/v0/authentication/login'
 const REGISTRATION_URL = '/cloud-user-registry/v0/registration'
+const REQUEST_PASSWORD_RESET_URL = '/cloud-user-registry/v0/authentication/password-reset'
+const CONFIRM_PASSWORD_RESET_URL = '/cloud-user-registry/v0/authentication/password-reset/confirm'
 const REFRESH_INTERVAL_MS = 8 * 60 * 1000 // 8 min; use-token expires in 10 min
 
 function setToken(token) {
@@ -106,5 +108,33 @@ export function useAuth() {
     clearToken()
   }
 
-  return { useToken, isAuthenticated, isInitialized, currentUserId, currentGroupId, init, login, register, selectGroup, logout }
+  // requestPasswordReset always resolves (the backend responds identically
+  // whether or not the email is registered, to avoid leaking which
+  // addresses have accounts) - callers should show a generic "check your
+  // email" message rather than branching on the result.
+  async function requestPasswordReset(email) {
+    await axios.post(REQUEST_PASSWORD_RESET_URL, { email })
+  }
+
+  // confirmPasswordReset redeems a reset token (from the emailed link) for
+  // a new password. It does not log the user in - they still need to sign
+  // in afterwards.
+  async function confirmPasswordReset(token, newPassword) {
+    await axios.post(CONFIRM_PASSWORD_RESET_URL, { token, newPassword })
+  }
+
+  return {
+    useToken,
+    isAuthenticated,
+    isInitialized,
+    currentUserId,
+    currentGroupId,
+    init,
+    login,
+    register,
+    selectGroup,
+    logout,
+    requestPasswordReset,
+    confirmPasswordReset,
+  }
 }

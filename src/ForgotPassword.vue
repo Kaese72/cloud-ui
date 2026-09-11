@@ -1,75 +1,60 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuth } from './composables/useAuth.js'
 
-const router = useRouter()
-const { login } = useAuth()
+const { requestPasswordReset } = useAuth()
 
-const username = ref('')
-const password = ref('')
-const error = ref('')
+const email = ref('')
 const loading = ref(false)
+const submitted = ref(false)
 
 async function handleSubmit() {
-  error.value = ''
   loading.value = true
   try {
-    await login(username.value, password.value)
-    router.push({ name: 'Home' })
-  } catch (e) {
-    if (e.response?.status === 401) {
-      error.value = 'Invalid username or password.'
-    } else {
-      error.value = 'Login failed. Please try again.'
-    }
+    await requestPasswordReset(email.value)
   } finally {
+    // Always show the same outcome, whether or not the address is
+    // registered - see useAuth.requestPasswordReset.
     loading.value = false
+    submitted.value = true
   }
 }
 </script>
 
 <template>
-  <div class="login-page">
-    <div class="login-card">
+  <div class="forgot-password-page">
+    <div class="forgot-password-card">
       <h1 class="app-title">Humi Cloud</h1>
+      <h2 class="forgot-password-heading">Reset your password</h2>
 
-      <form @submit.prevent="handleSubmit" class="login-form">
+      <div v-if="submitted" class="confirmation">
+        <p>If an account exists for <strong>{{ email }}</strong>, we've sent a link to reset your password. It expires shortly, so use it soon.</p>
+        <router-link to="/login" class="back-link">← Back to login</router-link>
+      </div>
+      <form v-else @submit.prevent="handleSubmit" class="forgot-password-form">
+        <p class="instructions">Enter the email address on your account and we'll send you a link to reset your password.</p>
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="email">Email</label>
           <input
-            id="username"
-            v-model="username"
-            type="text"
-            autocomplete="username"
+            id="email"
+            v-model="email"
+            type="email"
+            autocomplete="email"
             required
             :disabled="loading"
           />
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            autocomplete="current-password"
-            required
-            :disabled="loading"
-          />
-        </div>
-        <div v-if="error" class="error-msg">{{ error }}</div>
         <button type="submit" :disabled="loading" class="submit-btn">
-          {{ loading ? 'Logging in…' : 'Log in' }}
+          {{ loading ? 'Sending…' : 'Send reset link' }}
         </button>
-        <router-link to="/forgot-password" class="forgot-link">Forgot password?</router-link>
-        <router-link to="/register" class="register-link">Don't have an account? Register →</router-link>
+        <router-link to="/login" class="back-link">← Back to login</router-link>
       </form>
     </div>
   </div>
 </template>
 
 <style scoped>
-.login-page {
+.forgot-password-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -77,7 +62,7 @@ async function handleSubmit() {
   background: #f7f9fa;
 }
 
-.login-card {
+.forgot-password-card {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.10);
@@ -87,13 +72,27 @@ async function handleSubmit() {
 }
 
 .app-title {
-  margin: 0 0 1.5rem;
+  margin: 0 0 0.25rem;
   font-size: 1.8rem;
   color: #222e3a;
   text-align: center;
 }
 
-.login-form {
+.forgot-password-heading {
+  margin: 0 0 1.5rem;
+  font-size: 1rem;
+  color: #666;
+  text-align: center;
+  font-weight: 400;
+}
+
+.instructions {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.forgot-password-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -128,15 +127,6 @@ async function handleSubmit() {
   background: #f5f5f5;
 }
 
-.error-msg {
-  background: #fdecea;
-  border: 1px solid #f5c6cb;
-  border-radius: 5px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-  color: #721c24;
-}
-
 .submit-btn {
   background: #42b983;
   color: #fff;
@@ -159,16 +149,22 @@ async function handleSubmit() {
   cursor: default;
 }
 
-.forgot-link,
-.register-link {
+.confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.back-link {
   text-align: center;
   font-size: 0.9rem;
   color: #666;
   text-decoration: none;
 }
 
-.forgot-link:hover,
-.register-link:hover {
+.back-link:hover {
   color: #42b983;
 }
 </style>

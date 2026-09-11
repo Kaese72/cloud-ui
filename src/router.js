@@ -7,10 +7,14 @@ import Account from './Account.vue';
 import NotFound from './NotFound.vue';
 import Login from './Login.vue';
 import Register from './Register.vue';
+import ForgotPassword from './ForgotPassword.vue';
+import ResetPassword from './ResetPassword.vue';
 
 const routes = [
   { path: '/login', name: 'Login', component: Login, meta: { public: true } },
   { path: '/register', name: 'Register', component: Register, meta: { public: true } },
+  { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPassword, meta: { public: true } },
+  { path: '/reset-password', name: 'ResetPassword', component: ResetPassword, meta: { public: true } },
   { path: '/', redirect: '/home' },
   { path: '/home', name: 'Home', component: Home },
   { path: '/groups', name: 'Groups', component: Groups },
