@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAuth } from './composables/useAuth.js'
 import Home from './Home.vue';
 import Groups from './Groups.vue';
+import Appliances from './Appliances.vue';
 import Invitations from './Invitations.vue';
 import Account from './Account.vue';
 import NotFound from './NotFound.vue';
@@ -18,6 +19,7 @@ const routes = [
   { path: '/', redirect: '/home' },
   { path: '/home', name: 'Home', component: Home },
   { path: '/groups', name: 'Groups', component: Groups },
+  { path: '/appliances', name: 'Appliances', component: Appliances },
   { path: '/invitations', name: 'Invitations', component: Invitations },
   { path: '/account', name: 'Account', component: Account },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }

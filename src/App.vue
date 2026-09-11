@@ -34,6 +34,12 @@ function handleLogout() {
           </router-link>
         </li>
         <li>
+          <router-link to="/appliances">
+            <span class="nav-icon">📡</span>
+            <span class="nav-label">Appliances</span>
+          </router-link>
+        </li>
+        <li>
           <router-link to="/invitations">
             <span class="nav-icon">✉️</span>
             <span class="nav-label">Invitations</span>
