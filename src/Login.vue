@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from './composables/useAuth.js'
+import { takePendingEnroll } from './pendingEnroll.js'
 
 const router = useRouter()
 const { login } = useAuth()
@@ -16,7 +17,12 @@ async function handleSubmit() {
   loading.value = true
   try {
     await login(username.value, password.value)
-    router.push({ name: 'Home' })
+    const pendingEnroll = takePendingEnroll()
+    if (pendingEnroll) {
+      router.push({ name: 'Enroll', query: pendingEnroll })
+    } else {
+      router.push({ name: 'Home' })
+    }
   } catch (e) {
     if (e.response?.status === 401) {
       error.value = 'Invalid username or password.'

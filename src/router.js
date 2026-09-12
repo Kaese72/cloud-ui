@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuth } from './composables/useAuth.js'
+import { savePendingEnroll } from './pendingEnroll.js'
 import Home from './Home.vue';
 import Groups from './Groups.vue';
 import Appliances from './Appliances.vue';
@@ -10,6 +11,7 @@ import Login from './Login.vue';
 import Register from './Register.vue';
 import ForgotPassword from './ForgotPassword.vue';
 import ResetPassword from './ResetPassword.vue';
+import Enroll from './Enroll.vue';
 
 const routes = [
   { path: '/login', name: 'Login', component: Login, meta: { public: true } },
@@ -21,6 +23,7 @@ const routes = [
   { path: '/groups', name: 'Groups', component: Groups },
   { path: '/appliances', name: 'Appliances', component: Appliances },
   { path: '/invitations', name: 'Invitations', component: Invitations },
+  { path: '/enroll', name: 'Enroll', component: Enroll },
   { path: '/account', name: 'Account', component: Account },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
 ];
@@ -43,6 +46,7 @@ router.beforeEach(async (to) => {
 
   // Require authentication for all other routes
   if (!isAuthenticated.value) {
+    if (to.name === 'Enroll') savePendingEnroll(to.query)
     return { name: 'Login' }
   }
 })
