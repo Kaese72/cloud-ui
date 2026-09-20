@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
 
 const appliances = ref([])
+const showRevoked = ref(false)
 const error = ref(null)
 const isAdmin = ref(false)
 
@@ -30,13 +31,17 @@ async function fetchIsAdmin() {
 
 async function fetchAppliances() {
   try {
-    const response = await axios.get('/appliance-registry/v0/appliances')
+    const response = await axios.get('/appliance-registry/v0/appliances', {
+      params: showRevoked.value ? { includeRevoked: true } : {},
+    })
     appliances.value = response.data ?? []
     error.value = null
   } catch (err) {
     error.value = err
   }
 }
+
+watch(showRevoked, fetchAppliances)
 
 async function register() {
   if (!registerName.value) return
@@ -137,9 +142,15 @@ function formatDate(value) {
     </section>
 
     <section class="panel">
-      <h2>My appliances</h2>
+      <div class="panel-header">
+        <h2>My appliances</h2>
+        <label class="show-revoked">
+          <input v-model="showRevoked" type="checkbox" />
+          Show revoked
+        </label>
+      </div>
       <div v-if="appliances.length === 0" class="empty">
-        <p>No appliances registered yet.</p>
+        <p>{{ showRevoked ? 'No appliances registered yet.' : 'No active or pending appliances.' }}</p>
       </div>
       <ul v-else class="appliance-list">
         <li v-for="a in appliances" :key="a.id" class="appliance-card">
@@ -155,23 +166,34 @@ function formatDate(value) {
               <template v-if="a.lastSeenAt"> · Last seen {{ formatDate(a.lastSeenAt) }}</template>
             </p>
           </div>
-          <div v-if="isAdmin" class="appliance-actions">
-            <button
+          <div class="appliance-actions">
+            <a
               v-if="a.status === 'active'"
-              class="btn-rotate"
-              :disabled="actionApplianceId === a.id"
-              @click="rotate(a)"
+              class="btn-visit"
+              :href="`https://${a.hostname}`"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Rotate secret
-            </button>
-            <button
-              v-if="a.status !== 'revoked'"
-              class="btn-revoke"
-              :disabled="actionApplianceId === a.id"
-              @click="revoke(a)"
-            >
-              Revoke
-            </button>
+              Visit
+            </a>
+            <template v-if="isAdmin">
+              <button
+                v-if="a.status === 'active'"
+                class="btn-rotate"
+                :disabled="actionApplianceId === a.id"
+                @click="rotate(a)"
+              >
+                Rotate secret
+              </button>
+              <button
+                v-if="a.status !== 'revoked'"
+                class="btn-revoke"
+                :disabled="actionApplianceId === a.id"
+                @click="revoke(a)"
+              >
+                Revoke
+              </button>
+            </template>
           </div>
         </li>
       </ul>
@@ -208,6 +230,20 @@ function formatDate(value) {
 }
 .panel h2 {
   margin-top: 0;
+}
+.panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.show-revoked {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
 }
 .register-row {
   display: flex;
@@ -287,6 +323,16 @@ function formatDate(value) {
 .badge-pending { background: #fff3cd; color: #856404; }
 .badge-active { background: #d4edda; color: #1b5e20; }
 .badge-revoked { background: #f8d7da; color: #842029; }
+.btn-visit {
+  padding: 0.25rem 0.6rem;
+  background: #fff;
+  color: #369b6f;
+  border: 1px solid #42b983;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+.btn-visit:hover { background: #42b983; color: #fff; }
 .btn-revoke {
   padding: 0.25rem 0.6rem;
   background: #fff;
