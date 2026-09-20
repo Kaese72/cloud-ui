@@ -37,6 +37,7 @@ const currentGroupId = computed(() => {
 })
 
 const LOGIN_URL = '/cloud-user-registry/v0/authentication/login'
+const LOGOUT_URL = '/cloud-user-registry/v0/authentication/logout'
 const REGISTRATION_URL = '/cloud-user-registry/v0/registration'
 const REQUEST_PASSWORD_RESET_URL = '/cloud-user-registry/v0/authentication/password-reset'
 const CONFIRM_PASSWORD_RESET_URL = '/cloud-user-registry/v0/authentication/password-reset/confirm'
@@ -104,7 +105,12 @@ export function useAuth() {
     setToken(response.data['use-token'])
   }
 
-  function logout() {
+  async function logout() {
+    try {
+      await axios.post(LOGOUT_URL, {}, { withCredentials: true })
+    } catch {
+      // Still drop the local session; the refresh cookie just lives until it expires.
+    }
     clearToken()
   }
 

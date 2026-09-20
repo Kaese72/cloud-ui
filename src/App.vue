@@ -8,8 +8,8 @@ const { logout } = useAuth()
 
 const isPublicRoute = computed(() => route.meta.public === true)
 
-function handleLogout() {
-  logout()
+async function handleLogout() {
+  await logout()
   window.location.assign('/login')
 }
 </script>
