@@ -19,7 +19,7 @@ async function handleSubmit() {
     await login(username.value, password.value)
     const pendingEnroll = takePendingEnroll()
     if (pendingEnroll) {
-      router.push({ name: 'Enroll', query: pendingEnroll })
+      router.push({ name: pendingEnroll.name, query: pendingEnroll.query })
     } else {
       router.push({ name: 'Home' })
     }

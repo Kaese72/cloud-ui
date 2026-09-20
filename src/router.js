@@ -12,6 +12,7 @@ import Register from './Register.vue';
 import ForgotPassword from './ForgotPassword.vue';
 import ResetPassword from './ResetPassword.vue';
 import Enroll from './Enroll.vue';
+import ApplianceLogin from './ApplianceLogin.vue';
 
 const routes = [
   { path: '/login', name: 'Login', component: Login, meta: { public: true } },
@@ -24,6 +25,7 @@ const routes = [
   { path: '/appliances', name: 'Appliances', component: Appliances },
   { path: '/invitations', name: 'Invitations', component: Invitations },
   { path: '/enroll', name: 'Enroll', component: Enroll },
+  { path: '/appliance-login', name: 'ApplianceLogin', component: ApplianceLogin },
   { path: '/account', name: 'Account', component: Account },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
 ];
@@ -46,7 +48,7 @@ router.beforeEach(async (to) => {
 
   // Require authentication for all other routes
   if (!isAuthenticated.value) {
-    if (to.name === 'Enroll') savePendingEnroll(to.query)
+    if (to.name === 'Enroll' || to.name === 'ApplianceLogin') savePendingEnroll(to.name, to.query)
     return { name: 'Login' }
   }
 })
