@@ -16,8 +16,12 @@ const route = useRoute()
 const { currentGroupId, selectGroup } = useAuth()
 const error = ref(null)
 
-// The appliance's own UI is the only place a login code should ever be sent.
-const CALLBACK_PATH = '/cloud-login/callback'
+// The appliance's own UI is the only place a login code should ever be sent -
+// specifically, one of its own cloud-login-code callback pages. There are two:
+// the ordinary "log in with Humi Cloud" flow, and authentication's "link this
+// appliance user to a cloud account" flow - both redeem the code the same way,
+// so both are allowed here.
+const ALLOWED_CALLBACK_PATHS = ['/cloud-login/callback', '/cloud-link/callback']
 
 function loginCodeUrl(applianceId) {
   return `/appliance-registry/v0/appliances/${encodeURIComponent(applianceId)}/login-code`
@@ -69,7 +73,7 @@ onMounted(async () => {
     error.value = 'Invalid return address. Restart the login from the appliance.'
     return
   }
-  if (!['http:', 'https:'].includes(target.protocol) || target.pathname !== CALLBACK_PATH) {
+  if (!['http:', 'https:'].includes(target.protocol) || !ALLOWED_CALLBACK_PATHS.includes(target.pathname)) {
     error.value = 'Invalid return address. Restart the login from the appliance.'
     return
   }
