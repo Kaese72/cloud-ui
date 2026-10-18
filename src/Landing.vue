@@ -209,6 +209,8 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 
     <footer class="footer">
       <span class="footer-brand">Humi</span>
+      <!-- The top bar's Docs link is hidden on phones; this one isn't. -->
+      <a href="/docs/" class="footer-link">Documentation</a>
       <span>Made to stay at home.</span>
     </footer>
     </div>
@@ -700,6 +702,14 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--muted);
+}
+.footer-link {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-link:hover {
+  color: var(--text);
 }
 
 /* ---------- reveal (v-reveal) ---------- */

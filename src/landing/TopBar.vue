@@ -64,6 +64,8 @@ onBeforeUnmount(() => {
           :class="{ active: activeId === link.id }"
           @click.prevent="scrollToId(link.id)"
         >{{ link.label }}</a>
+        <!-- A separate site (humi-docs) behind the same ingress, not a section. -->
+        <a href="/docs/">Docs</a>
       </nav>
 
       <div class="auth">
