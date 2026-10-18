@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
+RUN cd dist/static-files/appliance/installation && sha256sum install-appliance.sh > install-appliance.sh.sha256
 
 # production stage
 FROM nginx:stable-alpine AS production-stage

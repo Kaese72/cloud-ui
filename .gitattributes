@@ -1,0 +1,2 @@
+# Served as-is and piped into bash; CRLF would break it.
+*.sh text eol=lf
