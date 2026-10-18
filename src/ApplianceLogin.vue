@@ -96,30 +96,50 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="appliance-login-page">
-    <div v-if="error" class="error">
-      <h1>Login failed</h1>
-      <p>{{ error }}</p>
+  <div class="status enter">
+    <div v-if="error" class="panel status-card">
+      <h1 class="page-title">Login failed</h1>
+      <div class="alert alert-error">{{ error }}</div>
     </div>
-    <div v-else class="pending">
-      <p>Logging you in to your appliance…</p>
+    <div v-else class="status-card">
+      <div class="spinner" aria-hidden="true" />
+      <p class="pending-text">Logging you in to your Appliance…</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-.appliance-login-page {
-  min-height: 60vh;
+.status {
+  min-height: 55vh;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.status-card {
+  max-width: 440px;
   text-align: center;
 }
-.error {
-  color: #c62828;
-  max-width: 420px;
+.status-card .page-title {
+  font-size: 2rem;
 }
-.pending {
-  color: #555;
+.spinner {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-top-color: var(--green);
+  animation: spin 0.9s linear infinite;
+}
+.pending-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 3s; }
 }
 </style>

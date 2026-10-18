@@ -94,267 +94,101 @@ async function changePassword() {
 </script>
 
 <template>
-  <div class="account-page">
-    <h1>Account</h1>
-    <div v-if="error">Error: {{ error.message }}</div>
-    <div v-else-if="user" class="account-info">
-      <div class="info-section">
-        <h3>General Information</h3>
-        <ul>
-          <li><strong>ID:</strong> {{ user.id }}</li>
-          <li><strong>Username:</strong> {{ user.username }}</li>
-        </ul>
-      </div>
+  <div class="page page-narrow enter">
+    <h1 class="page-title">Account</h1>
+    <p class="page-lede">Your Humi Cloud profile and sign-in details.</p>
+    <div v-if="error" class="alert alert-error">Error: {{ error.message }}</div>
 
-      <div class="info-section">
-        <h3>Profile</h3>
-        <div class="form-row">
-          <label>Name</label>
-          <input v-model="form.name" type="text" class="form-input" :disabled="saving" />
+    <template v-else-if="user">
+      <section class="panel">
+        <h2 class="panel-title">General</h2>
+        <dl class="details">
+          <dt>Username</dt>
+          <dd>{{ user.username }}</dd>
+          <dt>ID</dt>
+          <dd><code>{{ user.id }}</code></dd>
+        </dl>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Profile</h2>
+        <div class="field">
+          <label for="profile-name">Name</label>
+          <input id="profile-name" v-model="form.name" type="text" class="input" :disabled="saving" />
         </div>
-        <div class="form-row">
-          <label>Surname</label>
-          <input v-model="form.surname" type="text" class="form-input" :disabled="saving" />
+        <div class="field">
+          <label for="profile-surname">Surname</label>
+          <input id="profile-surname" v-model="form.surname" type="text" class="input" :disabled="saving" />
         </div>
-        <div class="form-row">
-          <label>Email</label>
-          <input v-model="form.email" type="email" class="form-input" :disabled="saving" />
+        <div class="field">
+          <label for="profile-email">Email</label>
+          <input id="profile-email" v-model="form.email" type="email" class="input" :disabled="saving" />
         </div>
-        <div v-if="saveError" class="save-error">{{ saveError }}</div>
+        <div v-if="saveError" class="alert alert-error">{{ saveError }}</div>
         <div class="form-actions">
-          <button class="save-button" :disabled="saving || !isDirty()" @click="saveUser">
-            {{ saving ? 'Saving...' : 'Save' }}
+          <button class="btn btn-primary" :disabled="saving || !isDirty()" @click="saveUser">
+            {{ saving ? 'Saving…' : 'Save' }}
           </button>
-          <button class="cancel-button" :disabled="saving || !isDirty()" @click="resetForm">Reset</button>
+          <button class="btn btn-ghost" :disabled="saving || !isDirty()" @click="resetForm">Reset</button>
         </div>
-      </div>
+      </section>
 
-      <div class="info-section">
-        <h3>Security</h3>
-        <button class="btn-change-password" @click="openPasswordDialog">Change password</button>
-      </div>
-    </div>
-    <div v-else>Loading...</div>
+      <section class="panel">
+        <h2 class="panel-title">Security</h2>
+        <button class="btn btn-ghost" @click="openPasswordDialog">Change password</button>
+      </section>
+    </template>
+    <p v-else class="empty">Loading…</p>
 
     <div v-if="showPasswordDialog" class="dialog-backdrop" @click.self="closePasswordDialog">
-      <div class="dialog">
-        <h3>Change password</h3>
-        <input
-          v-model="passwordForm.currentPassword"
-          class="dialog-input"
-          type="password"
-          placeholder="Current password"
-          autocomplete="current-password"
-          :disabled="changingPassword"
-        />
-        <input
-          v-model="passwordForm.newPassword"
-          class="dialog-input"
-          type="password"
-          placeholder="New password"
-          autocomplete="new-password"
-          :disabled="changingPassword"
-        />
-        <input
-          v-model="passwordForm.confirmPassword"
-          class="dialog-input"
-          type="password"
-          placeholder="Confirm new password"
-          autocomplete="new-password"
-          :disabled="changingPassword"
-          @keyup.enter="changePassword"
-        />
-        <div v-if="passwordError" class="dialog-error">{{ passwordError }}</div>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="password-dialog-title">
+        <h3 id="password-dialog-title" class="dialog-title">Change password</h3>
+        <div class="field">
+          <label for="current-password">Current password</label>
+          <input
+            id="current-password"
+            v-model="passwordForm.currentPassword"
+            class="input"
+            type="password"
+            autocomplete="current-password"
+            :disabled="changingPassword"
+          />
+        </div>
+        <div class="field">
+          <label for="new-password">New password</label>
+          <input
+            id="new-password"
+            v-model="passwordForm.newPassword"
+            class="input"
+            type="password"
+            autocomplete="new-password"
+            :disabled="changingPassword"
+          />
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirm new password</label>
+          <input
+            id="confirm-password"
+            v-model="passwordForm.confirmPassword"
+            class="input"
+            type="password"
+            autocomplete="new-password"
+            :disabled="changingPassword"
+            @keyup.enter="changePassword"
+          />
+        </div>
+        <div v-if="passwordError" class="alert alert-error">{{ passwordError }}</div>
         <div class="dialog-actions">
+          <button class="btn btn-ghost" :disabled="changingPassword" @click="closePasswordDialog">Cancel</button>
           <button
-            class="dialog-save-button"
+            class="btn btn-primary"
             :disabled="changingPassword || !passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword"
             @click="changePassword"
           >
-            {{ changingPassword ? 'Saving...' : 'Save' }}
+            {{ changingPassword ? 'Saving…' : 'Save' }}
           </button>
-          <button class="dialog-cancel-button" :disabled="changingPassword" @click="closePasswordDialog">Cancel</button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.account-page {
-  width: 100%;
-  max-width: 560px;
-}
-.account-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.info-section {
-  background: #f9f9f9;
-  padding: 1rem;
-  border-radius: 4px;
-  border: 1px solid #e0e0e0;
-}
-
-.info-section h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: #333;
-  font-size: 1.1rem;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-li {
-  margin-bottom: 0.5rem;
-  padding: 0.25rem 0;
-}
-
-strong {
-  color: #555;
-  margin-right: 0.5rem;
-}
-
-.form-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.75rem;
-}
-
-.form-row label {
-  font-size: 0.85rem;
-  color: #555;
-  margin-bottom: 0.3rem;
-}
-
-.form-input {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-}
-
-.form-input:disabled { background: #f0f0f0; }
-
-.save-error {
-  color: #c62828;
-  font-size: 0.85rem;
-  margin-bottom: 0.6rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.save-button {
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 4px;
-  background: #2d8cff;
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.save-button:disabled {
-  background: #9bbcf2;
-  cursor: not-allowed;
-}
-
-.cancel-button {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  background: #f4f4f4;
-  color: #222;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.cancel-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-change-password {
-  padding: 0.4rem 0.8rem;
-  background: #1565c0;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.btn-change-password:hover { background: #0d47a1; }
-
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-}
-.dialog {
-  width: 360px;
-  max-width: calc(100vw - 2rem);
-  background: #fff;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  padding: 1rem;
-}
-.dialog h3 {
-  margin-top: 0;
-  margin-bottom: 0.8rem;
-}
-.dialog-input {
-  width: 100%;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  margin-bottom: 0.6rem;
-}
-.dialog-input:disabled { background: #f5f5f5; }
-.dialog-error {
-  color: #c62828;
-  font-size: 0.85rem;
-  margin-bottom: 0.6rem;
-}
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-.dialog-save-button,
-.dialog-cancel-button {
-  padding: 0.45rem 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.dialog-save-button {
-  border: 1px solid #2e7d32;
-  background: #2e7d32;
-  color: #fff;
-}
-.dialog-save-button:disabled,
-.dialog-cancel-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.dialog-cancel-button {
-  border: 1px solid #d0d0d0;
-  background: #f4f4f4;
-  color: #222;
-}
-</style>

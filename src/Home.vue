@@ -21,71 +21,90 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="home-container">
-    <h1>Welcome{{ user ? `, ${user.name}` : '' }}</h1>
-    <p v-if="error">Could not load your account overview. Please try again later.</p>
-    <div v-else-if="group" class="current-group-card">
+  <div class="page enter">
+    <p class="kicker">Humi Cloud</p>
+    <h1 class="page-title">Welcome home<span v-if="user?.name">, {{ user.name }}</span>.</h1>
+    <p class="page-lede">Everything your Humi Cloud account connects, in one place.</p>
+
+    <div v-if="error" class="alert alert-error">Could not load your account overview. Please try again later.</div>
+
+    <section v-else-if="group" class="panel current-group">
       <p class="label">You are currently in</p>
-      <p class="group-name">{{ group.name }}</p>
-      <p class="role">
+      <div class="group-line">
+        <span class="group-name">{{ group.name }}</span>
         <span v-if="group.owner" class="badge badge-owner">Owner</span>
         <span v-else-if="group.admin" class="badge badge-admin">Admin</span>
         <span v-else class="badge badge-member">Member</span>
-      </p>
-      <router-link to="/groups" class="manage-link">Manage groups →</router-link>
+      </div>
+      <router-link to="/groups" class="btn btn-ghost btn-sm">Manage groups →</router-link>
+    </section>
+
+    <div class="shortcuts">
+      <router-link to="/appliances" class="shortcut">
+        <span class="shortcut-title">Appliances</span>
+        <span class="shortcut-body">The Humi Appliances your group owns, and their Cloud connection.</span>
+      </router-link>
+      <router-link to="/groups" class="shortcut">
+        <span class="shortcut-title">Groups</span>
+        <span class="shortcut-body">Who you share your homes with, and what they can do.</span>
+      </router-link>
+      <router-link to="/invitations" class="shortcut">
+        <span class="shortcut-title">Invitations</span>
+        <span class="shortcut-body">Invitations from other households waiting for you.</span>
+      </router-link>
     </div>
   </div>
 </template>
 
 <style scoped>
-.home-container {
+.current-group .label {
+  margin: 0 0 6px;
+}
+.group-line {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 2rem;
-  text-align: center;
-}
-.current-group-card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1.5rem 2rem;
-  margin-top: 1rem;
-  min-width: 260px;
-}
-.label {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #888;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 .group-name {
-  margin: 0.25rem 0;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #222e3a;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
-.role {
-  margin: 0.5rem 0 1rem;
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-.badge-owner { background: #fff3cd; color: #856404; }
-.badge-admin { background: #cfe2ff; color: #1565c0; }
-.badge-member { background: #eee; color: #555; }
-.manage-link {
-  font-size: 0.9rem;
-  color: #42b983;
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  color: var(--text);
   text-decoration: none;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
 }
-.manage-link:hover {
-  text-decoration: underline;
+.shortcut:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--green) 50%, transparent);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+.shortcut-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.shortcut-title::after {
+  content: ' →';
+  color: var(--green-ink);
+}
+.shortcut-body {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
 }
 </style>

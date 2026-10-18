@@ -47,115 +47,35 @@ async function decline(invitation) {
 </script>
 
 <template>
-  <div class="invitations-page">
-    <h1>Invitations</h1>
-    <div v-if="error" class="error">Error: {{ error.message }}</div>
-    <div v-if="actionError" class="error">{{ actionError }}</div>
+  <div class="page page-narrow enter">
+    <h1 class="page-title">Invitations</h1>
+    <p class="page-lede">Groups that have invited you to join them.</p>
+    <div v-if="error" class="alert alert-error">Error: {{ error.message }}</div>
+    <div v-if="actionError" class="alert alert-error">{{ actionError }}</div>
 
-    <div v-if="invitations.length === 0 && !error" class="empty">
-      <p>No pending invitations.</p>
-    </div>
-
-    <ul v-else class="invitation-list">
-      <li v-for="invitation in invitations" :key="invitation.id" class="invitation-card">
-        <div class="invitation-info">
-          <p class="group-name">{{ invitation.groupName }}</p>
-          <p class="invited-by">Invited by {{ invitation.invitedByUsername }}</p>
-        </div>
-        <div class="invitation-actions">
-          <button
-            class="btn-accept"
-            :disabled="actionId === invitation.id"
-            @click="accept(invitation)"
-          >
-            Accept
-          </button>
-          <button
-            class="btn-decline"
-            :disabled="actionId === invitation.id"
-            @click="decline(invitation)"
-          >
-            Decline
-          </button>
-        </div>
-      </li>
-    </ul>
+    <section class="panel">
+      <p v-if="invitations.length === 0 && !error" class="empty">No pending invitations.</p>
+      <ul v-else class="rows">
+        <li v-for="invitation in invitations" :key="invitation.id" class="row">
+          <div class="row-main">
+            <p class="row-title">{{ invitation.groupName }}</p>
+            <p class="row-meta">Invited by {{ invitation.invitedByUsername }}</p>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-primary btn-sm" :disabled="actionId === invitation.id" @click="accept(invitation)">
+              Accept
+            </button>
+            <button class="btn btn-danger btn-sm" :disabled="actionId === invitation.id" @click="decline(invitation)">
+              Decline
+            </button>
+          </div>
+        </li>
+      </ul>
+    </section>
 
     <p class="hint">
-      Accepting joins the group, but doesn't switch you into it - use
+      Accepting joins the group but doesn't switch you into it. Use
       <router-link to="/groups">Groups</router-link> to switch over.
     </p>
   </div>
 </template>
-
-<style scoped>
-.invitations-page {
-  width: 100%;
-  max-width: 640px;
-}
-.empty {
-  color: #999;
-  font-style: italic;
-  padding: 1rem 0;
-}
-.invitation-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.invitation-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 0.75rem;
-}
-.group-name {
-  margin: 0;
-  font-weight: 600;
-  color: #222e3a;
-}
-.invited-by {
-  margin: 0.15rem 0 0;
-  font-size: 0.85rem;
-  color: #888;
-}
-.invitation-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-.btn-accept {
-  padding: 0.4rem 0.9rem;
-  background: #42b983;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.btn-accept:hover:not(:disabled) { background: #369b6f; }
-.btn-decline {
-  padding: 0.4rem 0.9rem;
-  background: #fff;
-  color: #c62828;
-  border: 1px solid #c62828;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.btn-decline:hover:not(:disabled) { background: #c62828; color: #fff; }
-.btn-accept:disabled, .btn-decline:disabled { opacity: 0.6; cursor: default; }
-.error {
-  color: #c62828;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
-}
-.hint {
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 1.5rem;
-}
-</style>

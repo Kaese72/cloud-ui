@@ -1,27 +1,27 @@
 <template>
-  <div class="not-found-container">
-    <h1>404 - Page Not Found</h1>
-    <p>The page you are looking for does not exist.</p>
-    <router-link to="/home">Go to Home</router-link>
+  <div class="status enter">
+    <div class="status-card">
+      <p class="kicker">404</p>
+      <h1 class="page-title">This room doesn't exist.</h1>
+      <p class="page-lede">The page you're looking for isn't here.</p>
+      <router-link to="/home" class="btn btn-primary">Go home</router-link>
+    </div>
   </div>
 </template>
 
-<script setup>
-// No script needed
-</script>
-
 <style scoped>
-.not-found-container {
+.status {
+  min-height: 55vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  padding: 2rem;
 }
-.not-found-container a {
-  margin-top: 1rem;
-  color: #42b983;
-  text-decoration: underline;
+.status-card {
+  max-width: 440px;
+  text-align: center;
+}
+.status-card .page-lede {
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>

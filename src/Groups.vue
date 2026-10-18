@@ -156,253 +156,144 @@ async function removeMember(member) {
 </script>
 
 <template>
-  <div class="groups-page">
-    <h1>Groups</h1>
-    <div v-if="error" class="error">Error: {{ error.message }}</div>
+  <div class="page enter">
+    <h1 class="page-title">Groups</h1>
+    <p class="page-lede">
+      You're always in one group at a time. Members, invitations and Appliances on these pages
+      belong to the current one.
+    </p>
+    <div v-if="error" class="alert alert-error">Error: {{ error.message }}</div>
 
     <section class="panel">
-      <h2>My groups</h2>
-      <ul class="group-switcher">
-        <li v-for="g in groups" :key="g.id" :class="{ current: current && g.id === current.id }">
-          <span class="group-switcher-name">{{ g.name }}</span>
-          <span v-if="g.owner" class="badge badge-owner">Owner</span>
-          <span v-else-if="g.admin" class="badge badge-admin">Admin</span>
-          <button
-            v-if="!current || g.id !== current.id"
-            class="btn-switch"
-            :disabled="switchingId === g.id"
-            @click="switchGroup(g.id)"
-          >
-            {{ switchingId === g.id ? 'Switching…' : 'Switch to' }}
-          </button>
-          <span v-else class="current-label">Current</span>
+      <h2 class="panel-title">My groups</h2>
+      <ul class="rows">
+        <li v-for="g in groups" :key="g.id" class="row" :class="{ 'is-current': current && g.id === current.id }">
+          <div class="row-main">
+            <p class="row-title">
+              {{ g.name }}
+              <span v-if="g.owner" class="badge badge-owner">Owner</span>
+              <span v-else-if="g.admin" class="badge badge-admin">Admin</span>
+            </p>
+          </div>
+          <div class="row-actions">
+            <button
+              v-if="!current || g.id !== current.id"
+              class="btn btn-ghost btn-sm"
+              :disabled="switchingId === g.id"
+              @click="switchGroup(g.id)"
+            >
+              {{ switchingId === g.id ? 'Switching…' : 'Switch to' }}
+            </button>
+            <span v-else class="current-label">● Current</span>
+          </div>
         </li>
       </ul>
     </section>
 
     <section v-if="current" class="panel">
-      <h2>Current group</h2>
-      <div class="name-row">
-        <input v-model="editName" class="name-input" :disabled="!current.admin || savingName" />
-        <button
-          v-if="current.admin"
-          class="btn-save"
-          :disabled="savingName || editName === current.name || !editName"
-          @click="saveName"
-        >
-          {{ savingName ? 'Saving…' : 'Save' }}
-        </button>
+      <h2 class="panel-title">Current group</h2>
+      <div class="field">
+        <label for="group-name">Name</label>
+        <div class="inline-form">
+          <input id="group-name" v-model="editName" class="input" :disabled="!current.admin || savingName" />
+          <button
+            v-if="current.admin"
+            class="btn btn-primary"
+            :disabled="savingName || editName === current.name || !editName"
+            @click="saveName"
+          >
+            {{ savingName ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
       </div>
-      <div v-if="nameError" class="error">{{ nameError }}</div>
+      <div v-if="nameError" class="alert alert-error">{{ nameError }}</div>
 
-      <h3>Members</h3>
-      <div v-if="membersError" class="error">Error: {{ membersError.message }}</div>
-      <div v-if="memberActionError" class="error">{{ memberActionError }}</div>
-      <table class="members-table">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Role</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="member in members" :key="member.userId">
-            <td>
-              {{ member.username }}
-              <span v-if="member.userId === currentUserId" class="badge-you">YOU</span>
-            </td>
-            <td>{{ [member.name, member.surname].filter(Boolean).join(' ') || '—' }}</td>
-            <td>
-              <span v-if="member.owner" class="badge badge-owner">Owner</span>
-              <span v-else-if="member.admin" class="badge badge-admin">Admin</span>
-              <span v-else class="badge badge-member">Member</span>
-            </td>
-            <td class="member-actions">
-              <button
-                v-if="current.admin && !member.owner"
-                class="btn-toggle-admin"
-                :disabled="memberActionUserId === member.userId"
-                @click="toggleAdmin(member)"
-              >
-                {{ member.admin ? 'Revoke admin' : 'Make admin' }}
-              </button>
-              <button
-                v-if="!member.owner && (current.admin || member.userId === currentUserId)"
-                class="btn-remove"
-                :disabled="memberActionUserId === member.userId"
-                @click="removeMember(member)"
-              >
-                {{ member.userId === currentUserId ? 'Leave' : 'Remove' }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <h3 class="panel-subtitle">Members</h3>
+      <div v-if="membersError" class="alert alert-error">Error: {{ membersError.message }}</div>
+      <div v-if="memberActionError" class="alert alert-error">{{ memberActionError }}</div>
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="member in members" :key="member.userId">
+              <td>
+                {{ member.username }}
+                <span v-if="member.userId === currentUserId" class="badge badge-neutral">You</span>
+              </td>
+              <td>{{ [member.name, member.surname].filter(Boolean).join(' ') || '—' }}</td>
+              <td>
+                <span v-if="member.owner" class="badge badge-owner">Owner</span>
+                <span v-else-if="member.admin" class="badge badge-admin">Admin</span>
+                <span v-else class="badge badge-member">Member</span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    v-if="current.admin && !member.owner"
+                    class="btn btn-ghost btn-sm"
+                    :disabled="memberActionUserId === member.userId"
+                    @click="toggleAdmin(member)"
+                  >
+                    {{ member.admin ? 'Revoke admin' : 'Make admin' }}
+                  </button>
+                  <button
+                    v-if="!member.owner && (current.admin || member.userId === currentUserId)"
+                    class="btn btn-danger btn-sm"
+                    :disabled="memberActionUserId === member.userId"
+                    @click="removeMember(member)"
+                  >
+                    {{ member.userId === currentUserId ? 'Leave' : 'Remove' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <template v-if="current.admin">
-        <h3>Invite a member</h3>
-        <div class="invite-row">
+        <h3 class="panel-subtitle">Invite a member</h3>
+        <div class="inline-form">
           <input
             v-model="inviteUsername"
-            class="invite-input"
+            class="input"
             type="text"
             placeholder="Username"
+            aria-label="Username to invite"
             :disabled="inviting"
             @keyup.enter="sendInvite"
           />
-          <button class="btn-invite" :disabled="inviting || !inviteUsername" @click="sendInvite">
+          <button class="btn btn-primary" :disabled="inviting || !inviteUsername" @click="sendInvite">
             {{ inviting ? 'Sending…' : 'Invite' }}
           </button>
         </div>
-        <div v-if="inviteError" class="error">{{ inviteError }}</div>
-        <div v-if="inviteSuccess" class="success">{{ inviteSuccess }}</div>
+        <div v-if="inviteError" class="alert alert-error">{{ inviteError }}</div>
+        <div v-if="inviteSuccess" class="alert alert-success">{{ inviteSuccess }}</div>
       </template>
     </section>
   </div>
 </template>
 
 <style scoped>
-.groups-page {
-  width: 100%;
-  max-width: 760px;
-}
-.panel {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-.panel h2 {
-  margin-top: 0;
-}
-.group-switcher {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.group-switcher li {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #eee;
-}
-.group-switcher li:last-child { border-bottom: none; }
-.group-switcher li.current { background: #f0f9f5; }
-.group-switcher-name {
-  flex: 1;
-  font-weight: 500;
+.row-title .badge {
+  margin-left: 8px;
 }
 .current-label {
-  font-size: 0.8rem;
-  color: #369b6f;
-  font-weight: 600;
-}
-.badge {
-  display: inline-block;
-  padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-.badge-owner { background: #fff3cd; color: #856404; }
-.badge-admin { background: #cfe2ff; color: #1565c0; }
-.badge-member { background: #eee; color: #555; }
-.badge-you {
-  margin-left: 0.4rem;
-  padding: 0.1rem 0.4rem;
-  background: #1565c0;
-  color: #fff;
-  border-radius: 3px;
-  font-size: 0.65rem;
-  font-weight: bold;
-}
-.btn-switch, .btn-save, .btn-invite {
-  padding: 0.35rem 0.75rem;
-  background: #42b983;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--green-ink);
 }
-.btn-switch:hover:not(:disabled), .btn-save:hover:not(:disabled), .btn-invite:hover:not(:disabled) {
-  background: #369b6f;
+td .badge {
+  margin-left: 6px;
 }
-.btn-switch:disabled, .btn-save:disabled, .btn-invite:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-.name-row {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-.name-input, .invite-input {
-  flex: 1;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.95rem;
-}
-.name-input:disabled { background: #f5f5f5; }
-.invite-row {
-  display: flex;
-  gap: 0.5rem;
-}
-.members-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1.25rem;
-}
-.members-table th {
-  text-align: left;
-  font-size: 0.8rem;
-  color: #888;
-  padding: 0.4rem 0.5rem;
-  border-bottom: 2px solid #eee;
-}
-.members-table td {
-  padding: 0.5rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-.member-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
-.btn-toggle-admin {
-  padding: 0.25rem 0.6rem;
-  background: #fff;
-  color: #1565c0;
-  border: 1px solid #1565c0;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-.btn-toggle-admin:hover:not(:disabled) { background: #1565c0; color: #fff; }
-.btn-remove {
-  padding: 0.25rem 0.6rem;
-  background: #fff;
-  color: #c62828;
-  border: 1px solid #c62828;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-.btn-remove:hover:not(:disabled) { background: #c62828; color: #fff; }
-.btn-toggle-admin:disabled, .btn-remove:disabled { opacity: 0.5; cursor: default; }
-.error {
-  color: #c62828;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
-}
-.success {
-  color: #1b5e20;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
+td:nth-child(3) .badge {
+  margin-left: 0;
 }
 </style>

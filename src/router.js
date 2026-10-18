@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuth } from './composables/useAuth.js'
 import { savePendingEnroll } from './pendingEnroll.js'
+import Landing from './Landing.vue';
 import Home from './Home.vue';
 import Groups from './Groups.vue';
 import Appliances from './Appliances.vue';
@@ -19,7 +20,7 @@ const routes = [
   { path: '/register', name: 'Register', component: Register, meta: { public: true } },
   { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPassword, meta: { public: true } },
   { path: '/reset-password', name: 'ResetPassword', component: ResetPassword, meta: { public: true } },
-  { path: '/', redirect: '/home' },
+  { path: '/', name: 'Landing', component: Landing, meta: { public: true } },
   { path: '/home', name: 'Home', component: Home },
   { path: '/groups', name: 'Groups', component: Groups },
   { path: '/appliances', name: 'Appliances', component: Appliances },

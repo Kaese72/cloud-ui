@@ -104,33 +104,35 @@ function formatDate(value) {
 </script>
 
 <template>
-  <div class="appliances-page">
-    <h1>Appliances</h1>
-    <div v-if="error" class="error">Error: {{ error.message }}</div>
-    <div v-if="actionError" class="error">{{ actionError }}</div>
+  <div class="page enter">
+    <h1 class="page-title">Appliances</h1>
+    <p class="page-lede">The Humi Appliances your current group owns, and their connection to the Cloud.</p>
+    <div v-if="error" class="alert alert-error">Error: {{ error.message }}</div>
+    <div v-if="actionError" class="alert alert-error">{{ actionError }}</div>
 
     <section v-if="isAdmin" class="panel">
-      <h2>Register a new appliance</h2>
-      <div class="register-row">
+      <h2 class="panel-title">Register a new Appliance</h2>
+      <div class="inline-form">
         <input
           v-model="registerName"
-          class="register-input"
+          class="input"
           type="text"
           placeholder="Appliance name"
+          aria-label="Appliance name"
           :disabled="registering"
           @keyup.enter="register"
         />
-        <button class="btn-register" :disabled="registering || !registerName" @click="register">
+        <button class="btn btn-primary" :disabled="registering || !registerName" @click="register">
           {{ registering ? 'Registering…' : 'Register' }}
         </button>
       </div>
-      <div v-if="registerError" class="error">{{ registerError }}</div>
+      <div v-if="registerError" class="alert alert-error">{{ registerError }}</div>
 
-      <div v-if="justRegistered" class="secret-reveal">
-        <p class="secret-warning">
-          Claim token — shown once, save it now. It's needed to claim this appliance during setup.
-        </p>
-        <dl>
+      <div v-if="justRegistered" class="secret">
+        <div class="alert alert-warning">
+          Claim token, shown once. Save it now: it's needed to claim this Appliance during setup.
+        </div>
+        <dl class="details">
           <dt>Appliance ID</dt>
           <dd><code>{{ justRegistered.id }}</code></dd>
           <dt>Claim token</dt>
@@ -143,43 +145,44 @@ function formatDate(value) {
 
     <section class="panel">
       <div class="panel-header">
-        <h2>My appliances</h2>
-        <label class="show-revoked">
+        <h2 class="panel-title">My Appliances</h2>
+        <label class="check">
           <input v-model="showRevoked" type="checkbox" />
           Show revoked
         </label>
       </div>
-      <div v-if="appliances.length === 0" class="empty">
-        <p>{{ showRevoked ? 'No appliances registered yet.' : 'No active or pending appliances.' }}</p>
-      </div>
-      <ul v-else class="appliance-list">
-        <li v-for="a in appliances" :key="a.id" class="appliance-card">
-          <div class="appliance-info">
-            <p class="appliance-name">
+      <p v-if="appliances.length === 0" class="empty">
+        {{ showRevoked ? 'No Appliances registered yet.' : 'No active or pending Appliances.' }}
+      </p>
+      <ul v-else class="rows">
+        <li v-for="a in appliances" :key="a.id" class="row">
+          <span class="device" :class="`device-${a.status}`" aria-hidden="true"><span class="led" /></span>
+          <div class="row-main">
+            <p class="row-title">
               {{ a.name }}
               <span class="badge" :class="`badge-${a.status}`">{{ a.status }}</span>
             </p>
-            <p class="appliance-hostname">{{ a.hostname }}</p>
-            <p class="appliance-meta">
+            <p class="row-meta">{{ a.hostname }}</p>
+            <p class="row-meta faint">
               Registered {{ formatDate(a.createdAt) }}
               <template v-if="a.claimedAt"> · Claimed {{ formatDate(a.claimedAt) }}</template>
               <template v-if="a.lastSeenAt"> · Last seen {{ formatDate(a.lastSeenAt) }}</template>
             </p>
           </div>
-          <div class="appliance-actions">
+          <div class="row-actions">
             <a
               v-if="a.status === 'active'"
-              class="btn-visit"
+              class="btn btn-ghost btn-sm"
               :href="`https://${a.hostname}`"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Visit
+              Visit ↗
             </a>
             <template v-if="isAdmin">
               <button
                 v-if="a.status === 'active'"
-                class="btn-rotate"
+                class="btn btn-ghost btn-sm"
                 :disabled="actionApplianceId === a.id"
                 @click="rotate(a)"
               >
@@ -187,7 +190,7 @@ function formatDate(value) {
               </button>
               <button
                 v-if="a.status !== 'revoked'"
-                class="btn-revoke"
+                class="btn btn-danger btn-sm"
                 :disabled="actionApplianceId === a.id"
                 @click="revoke(a)"
               >
@@ -199,12 +202,12 @@ function formatDate(value) {
       </ul>
     </section>
 
-    <div v-if="justRotated" class="panel secret-reveal">
-      <h2>New appliance secret</h2>
-      <p class="secret-warning">
-        Shown once, save it now. Update the appliance with this secret out-of-band.
-      </p>
-      <dl>
+    <section v-if="justRotated" class="panel">
+      <h2 class="panel-title">New Appliance secret</h2>
+      <div class="alert alert-warning">
+        Shown once. Save it now and update the Appliance with this secret out-of-band.
+      </div>
+      <dl class="details">
         <dt>Hostname</dt>
         <dd><code>{{ justRotated.hostname }}</code></dd>
         <dt>Tunnel URL</dt>
@@ -212,163 +215,57 @@ function formatDate(value) {
         <dt>Appliance secret</dt>
         <dd><code>{{ justRotated.applianceSecret }}</code></dd>
       </dl>
-    </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.appliances-page {
-  width: 100%;
-  max-width: 760px;
+.secret {
+  margin-top: 18px;
 }
-.panel {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
+.row-title .badge {
+  margin-left: 8px;
 }
-.panel h2 {
-  margin-top: 0;
-}
-.panel-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.show-revoked {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.85rem;
-  color: #555;
-  cursor: pointer;
-}
-.register-row {
-  display: flex;
-  gap: 0.5rem;
-}
-.register-input {
-  flex: 1;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.95rem;
-}
-.btn-register, .btn-rotate {
-  padding: 0.35rem 0.75rem;
-  background: #42b983;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.btn-register:hover:not(:disabled), .btn-rotate:hover:not(:disabled) {
-  background: #369b6f;
-}
-.btn-register:disabled, .btn-rotate:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-.empty {
-  color: #999;
-  font-style: italic;
-  padding: 0.5rem 0;
-}
-.appliance-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.appliance-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #eee;
-  gap: 1rem;
-}
-.appliance-card:last-child { border-bottom: none; }
-.appliance-name {
-  margin: 0;
-  font-weight: 600;
-  color: #222e3a;
-}
-.appliance-hostname {
-  margin: 0.15rem 0 0;
-  font-size: 0.85rem;
-  color: #555;
-}
-.appliance-meta {
-  margin: 0.15rem 0 0;
+.faint {
+  color: var(--faint);
   font-size: 0.8rem;
-  color: #888;
 }
-.appliance-actions {
-  display: flex;
-  gap: 0.5rem;
+/* A small Appliance with its status LED, like the one on the landing page. */
+.device {
+  position: relative;
   flex-shrink: 0;
+  width: 46px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(160deg, #26364a, #141e2b 70%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
-.badge {
-  display: inline-block;
-  margin-left: 0.5rem;
-  padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: capitalize;
+.led {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5f6d7d;
 }
-.badge-pending { background: #fff3cd; color: #856404; }
-.badge-active { background: #d4edda; color: #1b5e20; }
-.badge-revoked { background: #f8d7da; color: #842029; }
-.btn-visit {
-  padding: 0.25rem 0.6rem;
-  background: #fff;
-  color: #369b6f;
-  border: 1px solid #42b983;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  text-decoration: none;
+.device-active .led {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: breathe 2.4s ease-in-out infinite;
 }
-.btn-visit:hover { background: #42b983; color: #fff; }
-.btn-revoke {
-  padding: 0.25rem 0.6rem;
-  background: #fff;
-  color: #c62828;
-  border: 1px solid #c62828;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
+.device-pending .led {
+  background: var(--warm);
+  box-shadow: 0 0 6px var(--warm);
 }
-.btn-revoke:hover:not(:disabled) { background: #c62828; color: #fff; }
-.btn-revoke:disabled { opacity: 0.5; cursor: default; }
-.secret-reveal dl {
-  margin: 0.75rem 0 0;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.35rem 1rem;
+.device-revoked {
+  opacity: 0.45;
 }
-.secret-reveal dt {
-  font-size: 0.8rem;
-  color: #888;
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
-.secret-reveal dd {
-  margin: 0;
-  word-break: break-all;
-}
-.secret-warning {
-  margin: 0.75rem 0 0;
-  font-size: 0.85rem;
-  color: #856404;
-  background: #fff3cd;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-}
-.error {
-  color: #c62828;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
+@media (prefers-reduced-motion: reduce) {
+  .device-active .led { animation: none; }
 }
 </style>

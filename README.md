@@ -4,6 +4,9 @@ This UI is the frontend for `cloud-user-registry`: account registration and
 login, switching between the Groups a user belongs to, managing the
 currently active Group's members, and handling invitations.
 
+For the look and feel (dark mode colours, type, components and motion), see
+[DESIGN.md](DESIGN.md).
+
 ## Development
 
 A few things are required to make development easy.
