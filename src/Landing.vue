@@ -8,6 +8,7 @@ import { useSlideScroll } from './landing/useSlideScroll.js'
 import TopBar from './landing/TopBar.vue'
 import ApplianceScene from './landing/ApplianceScene.vue'
 import CloudScene from './landing/CloudScene.vue'
+import HumiH from './components/HumiH.vue'
 
 const { isAuthenticated } = useAuth()
 const { user } = useCurrentUser()
@@ -75,7 +76,6 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
         </div>
 
         <div class="hero-copy">
-          <p class="eyebrow">Home automation that stays at home</p>
           <h1 class="headline">
             <span class="welcome" aria-label="Welcome">
               <span
@@ -86,11 +86,9 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
                 aria-hidden="true"
               >{{ letter }}</span>
             </span>
-            <span class="humi">Humi.</span>
+            <span class="humi" aria-label="Humi."><HumiH /><span aria-hidden="true">umi.</span></span>
           </h1>
-          <p class="lede">
-            A home that knows your routines, and keeps everything it knows under your own roof.
-          </p>
+          <p class="eyebrow">Home automation that stays at home</p>
           <div class="hero-actions">
             <button class="btn btn-warm" @click="stepInside">Step inside</button>
             <router-link v-if="isAuthenticated" to="/home" class="btn btn-ghost">Open dashboard</router-link>
@@ -125,8 +123,14 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
             <rect class="doorway" x="177" y="222" width="46" height="78" rx="3" fill="url(#doorLight)" />
             <g class="door">
               <rect x="177" y="222" width="46" height="78" rx="3" />
-              <path class="door-mark" d="M193 235 V253 M207 235 V253 M193 244 H207" />
-              <circle cx="215" cy="266" r="2.5" />
+              <!-- The Humi H (HumiH.vue's proportions at 28px): the font's H
+                   with the roof and lit dot over it. -->
+              <g class="door-mark">
+                <text x="200" y="262" text-anchor="middle">H</text>
+                <polyline points="186.5,238.2 200,229.5 213.5,238.2" />
+                <circle cx="200" cy="236.6" r="1.7" />
+              </g>
+              <circle cx="217" cy="270" r="2.5" />
             </g>
           </svg>
         </div>
@@ -311,13 +315,13 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   filter: blur(calc(var(--copy) * 8px));
 }
 .eyebrow {
-  margin: 0 0 18px;
+  margin: 28px 0 0;
   color: var(--warm-ink);
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 0.8rem;
-  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both;
 }
 .headline {
   margin: 0;
@@ -349,14 +353,22 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
     letter-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s both,
     shimmer 8s linear 1.6s infinite;
 }
-.lede {
-  max-width: 36ch;
-  margin: 24px auto 0;
-  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
-  line-height: 1.55;
-  color: var(--muted);
-  text-wrap: balance;
-  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both;
+/* The roof rises about 0.35em above the headline's tight line box; the
+   padding makes room for it above the headline and, when the headline wraps
+   on narrow screens, under "Welcome". */
+.hero .humi {
+  --humi-ls: -0.055em;
+  padding-top: 0.4em;
+}
+/* The H takes the gradient like the other letters, but the gradient only
+   clips to text, so the roof is drawn in solid amber - lit like the house
+   below it. */
+.hero .humi :deep(.roof) {
+  color: var(--warm);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--warm) 45%, transparent));
+}
+.hero .humi :deep(.dot) {
+  background: var(--warm-light);
 }
 .hero-actions {
   display: flex;
@@ -427,12 +439,21 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   fill: var(--warm);
 }
 .door-mark {
-  fill: none;
-  stroke: var(--warm);
-  stroke-width: 3;
-  stroke-linecap: round;
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--warm) 90%, transparent));
   animation: fade-in 0.8s ease 2.9s both;
+}
+.door-mark text {
+  fill: var(--warm);
+  font-size: 28px;
+  font-weight: 800;
+}
+.door-mark polyline {
+  fill: none;
+  stroke: var(--warm);
+  stroke-width: 3.9;
+}
+.door-mark circle {
+  fill: var(--warm-light);
 }
 
 /* The wrapper carries the scroll-driven fade; the button's own entry
@@ -749,7 +770,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .letter, .humi, .eyebrow, .lede, .hero-actions, .house-line, .house-body, .win, .scroll-cue,
+  .letter, .humi, .eyebrow, .hero-actions, .house-line, .house-body, .win, .scroll-cue,
   .fireflies span, .wheel, .cta-glow, .cta .humi, .door-mark {
     animation: none !important;
   }

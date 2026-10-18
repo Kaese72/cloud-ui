@@ -20,7 +20,8 @@ Where things live:
 |---|---|
 | `src/theme.css` | Colour tokens for both themes |
 | `src/ui.css` | Shared app UI: page, panel, buttons, fields, badges, alerts, rows, table, dialog, auth card |
-| `src/components/` | `BrandMark`, `ThemeToggle`, `UserChip`, `AppTopBar` |
+| `src/components/` | `BrandMark`, `HumiH`, `ThemeToggle`, `UserChip`, `AppTopBar` |
+| `public/brand/`, `public/favicon.svg` | The Humi logo as static files |
 | `src/App.vue` | The three layouts (see section 8) |
 
 ## 1. Idea
@@ -239,8 +240,16 @@ home things a solid one. This is part of the meaning, so keep it.
 - **Icons**: simple stroke icons in a 24×24 box, `stroke-width 1.6`,
   round caps and joins, `fill: none`, in `#dfe6ee` on dark discs.
 - **House mark**: the house outline (roof + walls, round joins, amber, glow)
-  is the brand motif. The top-bar logo and the hero house share it. The
-  hero door has an amber stroke **H**.
+  is the brand motif of the hero house.
+- **Humi mark**: the font's own **H** with a house roof drawn over it
+  (square ends, 32% pitch, 0.12em eaves) and a lit amber dot under the peak
+  (`HumiH.vue`). Being real text it always matches the letters around it:
+  `<HumiH />umi` spells "Humi". The top-bar logo (`BrandMark`) and the hero
+  "Humi." use it, and the hero door carries it in amber. The roof follows
+  `color` (`--text` in the logo, `--warm` in the hero); the dot is always
+  `--warm` or `--warm-light`. Static files for use outside the app are in
+  `public/brand/` (light, dark, one-colour, app icon) plus
+  `public/favicon.svg`, which follows the browser's light/dark preference.
 
 ## 6. Motion
 
