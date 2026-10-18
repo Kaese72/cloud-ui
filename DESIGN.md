@@ -9,8 +9,9 @@ here (and to `theme.css` / `ui.css`) first, then use it.
 
 The Appliance UI (`huemie-ui`) has its own companion guide,
 [`huemie-ui/DESIGN.md`](../huemie-ui/DESIGN.md). It builds on this one:
-`theme.css`, `ui.css`, `useTheme.js`, `ThemeToggle`, `BrandMark` and
-`UserChip` are copied there unchanged, so change them here first and copy
+`theme.css`, `ui.css`, `useTheme.js`, `ThemeToggle`, `BrandMark`, `HumiH`,
+`UserChip` and the logo files in `public/` are copied there unchanged, so
+change them here first and copy
 them across. New tokens or colour meanings are added here first, even when
 only the Appliance needs them.
 

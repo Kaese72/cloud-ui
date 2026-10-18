@@ -7,6 +7,9 @@
 html {
   background: var(--bg);
   color-scheme: var(--scheme);
+  /* Always reserve the scrollbar's space, so centred content (e.g. the top
+     bar) doesn't shift when navigating between short and tall pages. */
+  scrollbar-gutter: stable;
 }
 
 body {
