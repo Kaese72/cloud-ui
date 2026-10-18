@@ -24,6 +24,8 @@ const links = [
 
       <nav class="links" aria-label="Main">
         <router-link v-for="link in links" :key="link.to" :to="link.to">{{ link.label }}</router-link>
+        <!-- A separate site (humi-docs) behind the same ingress, not a route. -->
+        <a href="/docs/">Docs</a>
       </nav>
 
       <div class="account">

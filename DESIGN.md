@@ -15,6 +15,11 @@ change them here first and copy
 them across. New tokens or colour meanings are added here first, even when
 only the Appliance needs them.
 
+The docs site (`humi-docs`, served at `/docs/`) copies `theme.css`,
+`useTheme.js`, `ThemeToggle`, `BrandMark`, `HumiH` and the logo files the
+same way, into `docs/.vitepress/theme/` and `docs/public/`. Copy changes
+there too.
+
 Where things live:
 
 | File | What |
