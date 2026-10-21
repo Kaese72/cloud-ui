@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useAuth } from './composables/useAuth.js'
 import { useCurrentUser } from './composables/useCurrentUser.js'
 import { vReveal } from './landing/reveal.js'
+import { vFit } from './landing/fit.js'
 import { useHeroIntro } from './landing/useHeroIntro.js'
 import { useSlideScroll } from './landing/useSlideScroll.js'
 import TopBar from './landing/TopBar.vue'
@@ -150,6 +151,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 
     <!-- ===== Two layers ===== -->
     <section id="layers" class="layers">
+      <div class="layers-fit" v-fit>
       <div class="layers-head">
         <h2 v-reveal>Two layers. One home.</h2>
         <p v-reveal style="--delay: 100ms">
@@ -182,12 +184,14 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
           </ul>
         </article>
       </div>
+      </div>
     </section>
 
     <!-- ===== Call to action ===== -->
     <div class="finale">
     <section class="cta">
       <div class="cta-glow" aria-hidden="true" />
+      <div class="cta-fit" v-fit>
       <template v-if="isAuthenticated">
         <h2 v-reveal>Welcome home<span v-if="firstName">, {{ firstName }}</span>.</h2>
         <p v-reveal style="--delay: 100ms">Your Appliances are waiting where you left them.</p>
@@ -203,6 +207,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
           <router-link to="/register" class="btn btn-ghost btn-lg">Create an account</router-link>
         </div>
       </template>
+      </div>
     </section>
 
     <footer class="footer">
@@ -496,11 +501,13 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 }
 
 /* ---------- layers ---------- */
-/* Like every other slide, the last two fill exactly one screen: a shorter
-   tail would make the final wheel step a small nudge to the page bottom. */
+/* Like every other slide, the last two are exactly one screen tall: a shorter
+   tail would make the final wheel step a small nudge to the page bottom, and
+   a taller one makes the step land mid-slide, where the snap pulls it back.
+   v-fit scales the content down when the window is too short for it. */
 .layers {
   scroll-snap-align: start;
-  min-height: 100vh;
+  height: 100vh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -508,6 +515,9 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   max-width: 1100px;
   margin: 0 auto;
   padding: 88px 24px 40px;
+}
+.layers-fit {
+  width: 100%;
 }
 .layers-head {
   text-align: center;
@@ -624,19 +634,23 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 /* ---------- cta ---------- */
 .finale {
   scroll-snap-align: start;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
 .cta {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
-  padding: 100px 24px;
+  padding: 88px 24px 40px;
   text-align: center;
   overflow: hidden;
+}
+.cta-fit {
+  position: relative;
 }
 .cta-glow {
   position: absolute;
@@ -759,11 +773,28 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   .layer-grid {
     grid-template-columns: 1fr;
   }
-  .layer {
-    padding: 28px 22px;
+  /* Stacked, the full feature list is far taller than a phone screen; keep
+     the titles so it still reads at a sensible size once fitted. */
+  .layers-head {
+    margin-bottom: 24px;
   }
-  .layers {
-    padding-top: 88px;
+  .layer {
+    padding: 22px 22px;
+  }
+  .layer header {
+    margin-bottom: 16px;
+  }
+  .layer ul {
+    gap: 10px;
+  }
+  .layer li {
+    align-items: center;
+  }
+  .layer li strong {
+    margin-bottom: 0;
+  }
+  .layer li span:not(.tick) {
+    display: none;
   }
 }
 

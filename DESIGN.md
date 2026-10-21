@@ -290,6 +290,11 @@ never jumpy.
   slide (`useSlideScroll`). A step never moves more than one screen.
 - Snap points are **1px anchors** (`.snap`), not the tall sections
   themselves, because a snap area taller than the viewport scrolls freely.
+- Every slide is **exactly** one screen tall (`height: 100vh`, never
+  `min-height`). A slide that grows past the screen makes a wheel step land
+  mid-slide, and the mandatory snap pulls it back, so scrolling feels stuck.
+  Content that might not fit goes in a `v-fit` wrapper, which scales it down
+  to the space available.
 - Arriving at a slide **triggers** its animations, which then run on time
   (`useScrollScene` "triggered" phases). They are not pinned to the scroll
   position.
