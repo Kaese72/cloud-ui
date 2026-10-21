@@ -21,8 +21,8 @@ const navLinks = [
 
 const root = ref(null)
 const hero = ref(null)
-const { stepInside, handleWheel } = useHeroIntro(hero, 'appliance')
-useSlideScroll(root, { intercept: handleWheel })
+const { stepInside, handleWheel } = useHeroIntro(hero, 'appliance', (y, done) => glideTo(y, done))
+const { glideTo } = useSlideScroll(root, { intercept: handleWheel })
 
 const welcomeLetters = 'Welcome'.split('')
 
@@ -141,8 +141,6 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
             Scroll to step inside
           </button>
         </div>
-
-        <div class="hero-fade" aria-hidden="true" />
       </div>
     </section>
 
@@ -269,7 +267,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 
 /* ---------- hero ---------- */
 .hero {
-  --cue: 0; --copy: 0; --open: 0; --zoom: 0; --fade: 0;
+  --cue: 0; --copy: 0; --open: 0;
   position: relative;
   height: 100vh;
   background:
@@ -297,7 +295,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
 .fireflies {
   position: absolute;
   inset: 0;
-  opacity: calc((1 - var(--zoom) * 2) * var(--ambient));
+  opacity: var(--ambient);
   pointer-events: none;
 }
 .fireflies span {
@@ -390,8 +388,6 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   display: block;
   width: 100%;
   overflow: visible;
-  transform-origin: 50% 81.6%;
-  transform: scale(calc(1 + var(--zoom) * 40));
 }
 .house-body {
   fill: var(--surface);
@@ -497,14 +493,6 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   border-radius: 2px;
   background: var(--warm);
   animation: wheel 1.6s ease-in-out infinite;
-}
-
-.hero-fade {
-  position: absolute;
-  inset: 0;
-  background: var(--interior);
-  opacity: var(--fade);
-  pointer-events: none;
 }
 
 /* ---------- layers ---------- */
@@ -783,10 +771,6 @@ onBeforeUnmount(() => document.documentElement.classList.remove('landing-page'))
   .letter, .humi, .eyebrow, .hero-actions, .house-line, .house-body, .win, .scroll-cue,
   .fireflies span, .wheel, .cta-glow, .cta .humi, .door-mark {
     animation: none !important;
-  }
-  /* Skip the zoom-through-the-door; the fade still hands over to the next section. */
-  .house {
-    transform: none;
   }
   .reveal {
     transform: none;

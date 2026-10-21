@@ -268,7 +268,6 @@ never jumpy.
 |---|---|---|
 | Out (default enter) | `cubic-bezier(0.2, 0.8, 0.2, 1)` or `(0.16, 1, 0.3, 1)` | Things arriving: text, reveals |
 | In-out | cubic in-out (`useScrollScene` `inOut`) | Timed scene phases, slide glides |
-| In | cubic in | Accelerating moves (the zoom through the door) |
 | Overshoot | `cubic-bezier(0.34, 1.4–1.56, 0.64, 1)` | Small playful pops only: chips, switch thumb |
 | Draw | `cubic-bezier(0.6, 0, 0.3, 1)` | SVG line drawing |
 
@@ -280,7 +279,8 @@ never jumpy.
 - Scene phases: `0.7 – 1.5s`, staggered by `90 – 140ms` (e.g. devices fly in
   one after another).
 - Slide glide (one wheel step): `~0.75 – 1.3s`, eased in-out.
-- Hero intro: `1.9s` forward, `1.4s` reverse.
+- Hero intro: door opens in `0.9s`, then a normal slide glide; `0.8s` to
+  close it again on the way back.
 - Ambient loops (LED breathing, cloud float, shimmer): `2.4 – 8s`, gentle.
 
 ### Scroll model

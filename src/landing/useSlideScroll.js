@@ -15,6 +15,7 @@ const GESTURE_GAP_MS = 160
 //
 // intercept(event, direction) runs first and may claim the gesture by
 // returning true (the hero intro uses this to play its own transition).
+// Returns glideTo(y, done) so the intro can finish with the same glide.
 export function useSlideScroll(rootRef, { intercept } = {}) {
   let frame = null
   let lastWheel = 0
@@ -39,12 +40,15 @@ export function useSlideScroll(rootRef, { intercept } = {}) {
     return [...points].sort((a, b) => a - b)
   }
 
-  function glideTo(target) {
+  function glideTo(target, done) {
     const html = document.documentElement
     const from = window.scrollY
     const max = html.scrollHeight - window.innerHeight
     const distance = Math.min(Math.max(0, target), max) - from
-    if (Math.abs(distance) < 1) return
+    if (Math.abs(distance) < 1) {
+      done?.()
+      return
+    }
     // Mandatory snapping would re-snap every intermediate frame; suspend it
     // for the glide and restore it once we're resting on a snap point.
     html.style.scrollSnapType = 'none'
@@ -59,6 +63,7 @@ export function useSlideScroll(rootRef, { intercept } = {}) {
       } else {
         frame = null
         html.style.scrollSnapType = ''
+        done?.()
       }
     }
     frame = requestAnimationFrame(step)
@@ -98,4 +103,6 @@ export function useSlideScroll(rootRef, { intercept } = {}) {
       document.documentElement.style.scrollSnapType = ''
     }
   })
+
+  return { glideTo }
 }

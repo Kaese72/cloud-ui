@@ -2,31 +2,28 @@ import { onMounted, onBeforeUnmount } from 'vue'
 
 const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v))
 const easeOut = t => 1 - Math.pow(1 - t, 3)
-const easeIn = t => t * t * t
 const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
-const FORWARD_MS = 1900
-const REVERSE_MS = 1400
-// After jumping to the next section, keep swallowing wheel/touch input for a
+const FORWARD_MS = 900
+const REVERSE_MS = 800
+// After gliding to the next section, keep swallowing wheel/touch input for a
 // moment so trackpad momentum doesn't carry straight on to the next slide.
 const MOMENTUM_GUARD_MS = 600
 
-// useHeroIntro plays the "step through the front door" transition from the
-// hero into `nextId` as a timed animation rather than tying it to the scroll
-// position: the browser's snap glide is far too quick for it. The first
-// scroll down at the top of the page (wheel, swipe or key) is intercepted,
-// the intro plays (copy out, door opens, zoom through it, fade to the
-// interior colour), and only then does the page jump - invisibly, since the
-// screen is a solid colour by then - to the next section. Scrolling back up
-// into the hero plays it in reverse.
+// useHeroIntro plays the "open the front door" intro before leaving the hero
+// for `nextId`. The first scroll down at the top of the page (wheel, swipe or
+// key) is intercepted, the copy fades out and the door swings open, and then
+// the page glides down to the next section with glideTo - the same glide as
+// every other slide. Scrolling back up into the hero closes the door again.
 //
-// It drives --cue, --copy, --open, --zoom and --fade on the hero element.
+// It drives --cue, --copy and --open on the hero element.
 // Returns stepInside() for buttons that should play the same transition, and
 // handleWheel() for useSlideScroll's intercept hook (wheel input is routed
 // through there so the two don't both react to the same gesture).
-export function useHeroIntro(heroRef, nextId) {
-  let progress = 0 // 0 = outside the house, 1 = through the door
+export function useHeroIntro(heroRef, nextId, glideTo) {
+  let progress = 0 // 0 = door closed, 1 = door open
   let frame = null
+  let gliding = false
   let lockUntil = 0
   let touchStartY = null
   let reduced = false
@@ -35,11 +32,9 @@ export function useHeroIntro(heroRef, nextId) {
     const el = heroRef.value
     if (!el) return
     const seg = (a, b) => clamp((t - a) / (b - a))
-    el.style.setProperty('--cue', easeOut(seg(0, 0.15)).toFixed(4))
-    el.style.setProperty('--copy', easeOut(seg(0, 0.32)).toFixed(4))
-    el.style.setProperty('--open', easeInOut(seg(0.1, 0.42)).toFixed(4))
-    el.style.setProperty('--zoom', easeIn(seg(0.3, 0.92)).toFixed(4))
-    el.style.setProperty('--fade', seg(0.8, 1).toFixed(4))
+    el.style.setProperty('--cue', easeOut(seg(0, 0.3)).toFixed(4))
+    el.style.setProperty('--copy', easeOut(seg(0, 0.6)).toFixed(4))
+    el.style.setProperty('--open', easeInOut(seg(0.2, 1)).toFixed(4))
   }
 
   function play(to, duration, done) {
@@ -63,7 +58,7 @@ export function useHeroIntro(heroRef, nextId) {
   }
 
   const playing = () => frame !== null
-  const locked = () => playing() || performance.now() < lockUntil
+  const locked = () => playing() || gliding || performance.now() < lockUntil
   const atStart = () => window.scrollY < 4 && progress === 0
 
   function stepInside() {
@@ -71,8 +66,11 @@ export function useHeroIntro(heroRef, nextId) {
     const next = document.getElementById(nextId)
     if (!next) return
     play(1, FORWARD_MS, () => {
-      window.scrollTo({ top: next.offsetTop, behavior: 'instant' })
-      lockUntil = performance.now() + MOMENTUM_GUARD_MS
+      gliding = true
+      glideTo(next.offsetTop, () => {
+        gliding = false
+        lockUntil = performance.now() + MOMENTUM_GUARD_MS
+      })
     })
   }
 
@@ -111,10 +109,10 @@ export function useHeroIntro(heroRef, nextId) {
     }
   }
 
-  // Coming back up: once the hero is in view again, walk back out the door.
+  // Coming back up: once the hero is in view again, close the door.
   function onScroll() {
     const el = heroRef.value
-    if (!el || playing() || progress === 0) return
+    if (!el || playing() || gliding || progress === 0) return
     if (window.scrollY < el.offsetHeight - 2) play(0, REVERSE_MS)
   }
 
