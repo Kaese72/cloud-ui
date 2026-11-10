@@ -70,9 +70,9 @@ install_argocd() {
 	# hand-over is a no-op.
 	local manifest
 	manifest="$(curl -sfL "$GITOPS_RAW/appliance/argocd/kustomization.yaml" \
-		| grep -oE 'https://raw\.githubusercontent\.com/argoproj/argo-cd/[^[:space:]]+/manifests/install\.yaml' \
+		| grep -oE 'https://raw\.githubusercontent\.com/argoproj/argo-cd/[^[:space:]]+/manifests/(core-)?install\.yaml' \
 		| head -n1)"
-	[ -n "$manifest" ] || fail "no ArgoCD install.yaml URL found in appliance/argocd/kustomization.yaml"
+	[ -n "$manifest" ] || fail "no ArgoCD install manifest URL found in appliance/argocd/kustomization.yaml"
 
 	log "installing ArgoCD from $manifest"
 	kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f - >/dev/null
@@ -82,7 +82,7 @@ install_argocd() {
 	kubectl wait --for=condition=Established crd/applications.argoproj.io --timeout=120s >/dev/null
 	kubectl -n argocd rollout status statefulset/argocd-application-controller --timeout=600s
 	kubectl -n argocd rollout status deployment/argocd-repo-server --timeout=600s
-	kubectl -n argocd rollout status deployment/argocd-server --timeout=600s
+	kubectl -n argocd rollout status deployment/argocd-applicationset-controller --timeout=600s
 }
 
 apply_applications() {
